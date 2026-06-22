@@ -275,23 +275,26 @@
 <!-- SLIDE 3: SUPUESTO — COLA EXPLOSIVA -->
 <div class="slide">
   <div class="slide-title">El <span>Supuesto</span> Clave</div>
-  <div class="slide-subtitle">¿Por qué los tiempos de llegada se duplicaron?</div>
+  <div class="slide-subtitle">¿Por qué los intervalos de llegada se duplicaron? · U = Σ(λᵢ × E[Sᵢ]) / c</div>
 
   <div class="two-col">
     <div class="col">
       <div class="info-box">
-        <h3>Distribución del tráfico</h3>
-        <p>La autovía es bidireccional. Los vehículos que van de Olavarría → Azul pasan por la estación <strong style="color:#f5c842">A</strong>, y los que van de Azul → Olavarría pasan por la estación <strong style="color:#f5c842">D</strong>. Asumiendo un reparto <strong style="color:#f5c842">50/50</strong>, cada estación recibe la mitad del flujo enunciado.</p>
-        <br>
-        <p style="color:#f5c842; font-size:17px; font-weight:700;">1 cada 30 seg (total) → 1 cada 60 seg (por estación)</p>
+        <h3>Factor de Utilización</h3>
+        <p>U mide qué fracción del tiempo están ocupados los servidores en conjunto.<br><br>
+        <strong style="color:#f5c842">U &lt; 1 → sistema estable</strong> · la cola se drena<br>
+        <strong style="color:#ff6b6b;">U ≥ 1 → sistema explosivo</strong> · la cola crece sin límite<br><br>
+        Donde <strong style="color:#f5c842">λᵢ</strong> = llegadas tipo i (veh/seg) · <strong style="color:#f5c842">E[Sᵢ]</strong> = servicio medio (seg) · <strong style="color:#f5c842">c</strong> = cabinas</p>
       </div>
       <div class="info-box">
-        <h3>Flujos con tiempos originales (sin duplicar)</h3>
-        <p style="color:#ccd6f6;">
-          λ_total (pico) = 1/30 + 1/40 + 1/25 + 1/380 ≈ <strong style="color:#ff6b6b;">0.101 veh/seg</strong><br>
-          Servicio promedio ponderado ≈ 32 seg<br><br>
-          <strong style="color:#ff6b6b;">ρ = 0.101 × 32 = 3.23</strong><br>
-          Se necesitan más de 3 cabinas para estabilizar → <strong style="color:#ff6b6b;">SISTEMA EXPLOSIVO</strong>
+        <h3>Cálculo con tasas ORIGINALES del enunciado</h3>
+        <p style="font-family: 'Courier New', monospace; font-size:13px; line-height:2; color:#ccd6f6;">
+          <span style="color:#8ab4f8">No pico · c = 1:</span><br>
+          (1/60)×50 + (1/70)×30 + (1/40)×23.33 + (1/380)×30<br>
+          = 0.833 + 0.429 + 0.583 + 0.079 = <strong style="color:#ff6b6b;">1.924 / 1 = 1.92</strong><br><br>
+          <span style="color:#8ab4f8">Pico · c = 2:</span><br>
+          (1/30)×50 + (1/40)×30 + (1/25)×23.33 + (1/380)×30<br>
+          = 1.667 + 0.750 + 0.933 + 0.079 = <strong style="color:#ff6b6b;">3.429 / 2 = 1.71</strong>
         </p>
       </div>
     </div>
@@ -299,32 +302,32 @@
       <table>
         <tr>
           <th>Escenario</th>
-          <th>Cabinas</th>
-          <th>ρ</th>
+          <th>Cabinas (c)</th>
+          <th>U</th>
           <th>Estado</th>
         </tr>
         <tr>
-          <td>Original · no pico</td><td>1</td><td>2.01</td><td class="bad">Explosivo</td>
+          <td>Original · no pico</td><td>1</td><td class="bad">1.92</td><td class="bad">Explosivo</td>
         </tr>
         <tr>
-          <td>Original · pico</td><td>2</td><td>1.62</td><td class="bad">Explosivo</td>
+          <td>Original · pico</td><td>2</td><td class="bad">1.71</td><td class="bad">Explosivo</td>
         </tr>
         <tr>
-          <td>Original · pico</td><td>3</td><td>1.08</td><td class="bad">Explosivo</td>
+          <td>Original · pico</td><td>3</td><td class="bad">1.14</td><td class="bad">Explosivo</td>
         </tr>
         <tr>
-          <td style="color:#f5c842">50/50 · no pico</td><td style="color:#f5c842">1</td><td style="color:#f5c842">0.89</td><td class="ok">Estable ✓</td>
+          <td style="color:#f5c842">50/50 · no pico</td><td style="color:#f5c842">1</td><td style="color:#f5c842">0.96</td><td class="ok">Estable ✓</td>
         </tr>
         <tr>
-          <td style="color:#f5c842">50/50 · pico</td><td style="color:#f5c842">2</td><td style="color:#f5c842">0.81</td><td class="ok">Estable ✓</td>
+          <td style="color:#f5c842">50/50 · pico</td><td style="color:#f5c842">2</td><td style="color:#f5c842">0.86</td><td class="ok">Estable ✓</td>
         </tr>
         <tr>
-          <td style="color:#f5c842">50/50 · pico c/3ra</td><td style="color:#f5c842">3</td><td style="color:#f5c842">0.54</td><td class="ok">Estable ✓</td>
+          <td style="color:#f5c842">50/50 · pico c/3ra</td><td style="color:#f5c842">3</td><td style="color:#f5c842">0.57</td><td class="ok">Estable ✓</td>
         </tr>
       </table>
-      <div class="info-box" style="margin-top:20px;">
-        <h3>Conclusión del supuesto</h3>
-        <p>Sin el ajuste 50/50 la cola crecería infinitamente <strong style="color:#ff6b6b;">durante todo el día</strong>, haciendo la simulación irrelevante. El supuesto es físicamente plausible y matemáticamente necesario.</p>
+      <div class="info-box" style="margin-top:16px;">
+        <h3>Distribución del tráfico</h3>
+        <p>La autovía es bidireccional: vehículos Olavarría→Azul pasan por <strong style="color:#f5c842">A</strong>, y Azul→Olavarría por <strong style="color:#f5c842">D</strong>. Con reparto <strong style="color:#f5c842">50/50</strong> cada estación recibe la mitad del flujo, duplicando el intervalo entre llegadas. Sin este ajuste, U &gt; 1 en todos los escenarios: la simulación sería matemáticamente inválida.</p>
       </div>
     </div>
   </div>
@@ -463,55 +466,108 @@
   <div class="page-line"></div>
 </div>
 
-<!-- SLIDE 6: RESULTADOS Y CONCLUSIÓN -->
+<!-- SLIDE 6: SEMILLA -->
+<div class="slide">
+  <div class="slide-title">Semilla para <span>Reproducibilidad</span></div>
+  <div class="slide-subtitle">Control de la generación de números aleatorios · random.seed()</div>
+
+  <div class="two-col">
+    <div class="col">
+      <div class="info-box">
+        <h3>¿Qué es la semilla?</h3>
+        <p>El módulo <code style="color:#f5c842">random</code> genera una secuencia de números U(0,1) a partir de un valor inicial llamado <strong style="color:#f5c842">semilla</strong>. La misma semilla siempre produce la misma secuencia, sin importar qué distribución la consuma (exponencial, uniforme, triangular).</p>
+      </div>
+      <div class="info-box">
+        <h3>Implementación en el código</h3>
+        <div class="code">
+          <span class="kw">for</span> i <span class="kw">in</span> <span class="fn">range</span>(n_replicas):<br>
+          &nbsp;&nbsp;&nbsp;&nbsp;random.<span class="fn">seed</span>(<span class="num">i</span>)&nbsp;&nbsp;<span class="cm"># semilla i para escenario base</span><br>
+          &nbsp;&nbsp;&nbsp;&nbsp;m_base, _ = <span class="fn">correr_simulacion</span>(<span class="kw">False</span>)<br><br>
+          &nbsp;&nbsp;&nbsp;&nbsp;random.<span class="fn">seed</span>(<span class="num">i</span>)&nbsp;&nbsp;<span class="cm"># misma semilla para dinámico</span><br>
+          &nbsp;&nbsp;&nbsp;&nbsp;m_din, c_din = <span class="fn">correr_simulacion</span>(<span class="kw">True</span>)
+        </div>
+        <p style="margin-top:10px;">Cada réplica <code style="color:#f5c842">i</code> usa semilla <code style="color:#f5c842">i</code>, garantizando que las 30 réplicas sean diferentes entre sí pero siempre reproducibles.</p>
+      </div>
+    </div>
+    <div class="col">
+      <div class="cards" style="flex-direction:column; gap:16px;">
+        <div class="card">
+          <div class="card-num">1</div>
+          <div class="card-text">
+            <strong>Reproducibilidad</strong><br>
+            Correr el programa dos veces distintas produce exactamente los mismos resultados. Permite verificar y compartir resultados sin ambigüedad.
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-num">2</div>
+          <div class="card-text">
+            <strong>Comparación justa entre escenarios</strong><br>
+            Al usar la misma semilla <code style="color:#f5c842">i</code> para el escenario base y el dinámico en cada réplica, ambos reciben la misma secuencia de eventos aleatorios. La diferencia observada se debe solo al escenario, no al azar.
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-num">3</div>
+          <div class="card-text">
+            <strong>Reducción de varianza</strong><br>
+            Al comparar escenarios con los mismos números aleatorios, las diferencias entre réplicas se reducen, haciendo los intervalos de confianza más precisos.
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="page-num">06</div>
+  <div class="page-line"></div>
+</div>
+
+<!-- SLIDE 7: RESULTADOS Y CONCLUSIÓN -->
 <div class="slide">
   <div class="slide-title"><span>Resultados</span> y Conclusión</div>
-  <div class="slide-subtitle">30 réplicas por escenario · IC 95% con distribución t de Student</div>
+  <div class="slide-subtitle">30 réplicas · semilla = i por réplica · IC 95% con t de Student (df = 29)</div>
 
   <div class="result-row">
     <div class="result-box">
       <h3>Escenario Base (sin 3ra cabina)</h3>
-      <div class="val">2.941</div>
-      <p>vehículos/día esperan más de 3 min<br>IC 95%: (2.769 – 3.113)</p>
+      <div class="val">3.044</div>
+      <p>vehículos/día esperan más de 3 min<br>IC 95%: (2.865 – 3.223)</p>
     </div>
     <div class="result-box">
       <h3>Escenario Dinámico (con 3ra cabina)</h3>
-      <div class="val">1.080</div>
-      <p>vehículos/día esperan más de 3 min<br>IC 95%: (1.051 – 1.109)</p>
+      <div class="val">1.073</div>
+      <p>vehículos/día esperan más de 3 min<br>IC 95%: (1.034 – 1.112)</p>
     </div>
     <div class="result-box">
       <h3>Costo extra por abrir 3ra cabina</h3>
-      <div class="val">$4.553</div>
+      <div class="val">$4.693</div>
       <p>promedio diario en bloques de $100/10min</p>
     </div>
   </div>
 
   <div class="formula">
-    Multa de equilibrio = Costo cabina / Vehículos salvados = $4.553 / 1.860 = <strong>$2,45 por vehículo</strong>
+    U = Costo cabina / Vehículos salvados = $4.693 / 1.971 = <strong>$2,38 por vehículo</strong>
   </div>
 
   <div class="result-row">
     <div class="result-box highlight">
       <h3>Respuesta al problema</h3>
-      <div class="val green">$2,45</div>
+      <div class="val green">$2,38</div>
       <p>
-        Si la multa por espera &gt;3 min es <strong style="color:#f5c842">mayor a $2,45</strong>, al concesionario le conviene abrir la 3ra cabina.<br>
-        Si la multa es <strong style="color:#ff6b6b">menor a $2,45</strong>, es más barato pagar las multas.<br>
+        Si la multa por espera &gt;3 min es <strong style="color:#f5c842">mayor a $2,38</strong>, al concesionario le conviene abrir la 3ra cabina.<br>
+        Si la multa es <strong style="color:#ff6b6b">menor a $2,38</strong>, es más barato pagar las multas.<br>
         Los IC no se superponen → diferencia estadísticamente significativa al 95%.
       </p>
     </div>
     <div class="result-box">
       <h3>Interpretación</h3>
       <p style="font-size:15px; line-height:1.8; color:#ccd6f6; margin-top:0;">
-        La 3ra cabina salva ~<strong style="color:#f5c842">1.860 vehículos/día</strong> de exceder los 3 minutos de espera.<br>
-        El costo de abrirla es ~<strong style="color:#f5c842">$4.553/día</strong>.<br>
-        Con una multa de <strong style="color:#f5c842">$2,45/vehículo</strong>, ambas opciones cuestan lo mismo.<br>
+        La 3ra cabina salva ~<strong style="color:#f5c842">1.971 vehículos/día</strong> de exceder los 3 minutos de espera.<br>
+        El costo de abrirla es ~<strong style="color:#f5c842">$4.693/día</strong>.<br>
+        Con una multa de <strong style="color:#f5c842">$2,38/vehículo</strong>, ambas opciones cuestan lo mismo.<br>
         Por encima de ese valor, la cabina extra se <strong style="color:#69db7c">paga sola</strong>.
       </p>
     </div>
   </div>
 
-  <div class="page-num">06</div>
+  <div class="page-num">07</div>
   <div class="page-line"></div>
 </div>
 

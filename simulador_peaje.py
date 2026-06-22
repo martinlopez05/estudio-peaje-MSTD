@@ -13,8 +13,19 @@ class PeajeConfig:
         'grandes': {'pico': 80.0, 'no_pico': 140.0},
         'pequenos': {'pico': 50.0, 'no_pico': 80.0},
         'motos': {'pico': 760.0, 'no_pico': 760.0}
-    }
-
+    }##las tasas de llegadas se duplican ya que se supone que los tiempos que daba 
+    ##enunciado eran la tasa de llegada entre las dos estaciones. Por ejemplo:
+    #un vehiculo de gran porte que tiene una tasa de llegada de 30 segundos, significa 
+    #que llega a UNA de las estaciones cada 30 segundos pero para una estacion individual
+    #el vehiculo de gran porte llega a la otra estacion en 30 segundos y 30 segundos
+    #despues llega a la actual, entonces el tiempo promedio de llegada es de 60 segundos.
+    #se supone esto debido a que si se tomaran los tiempos que dice la consigna, el sistema 
+    #seria explosivo 
+   ##'gran_porte': {'pico': 60.0, 'no_pico': 120.0},
+       ## 'grandes': {'pico': 80.0, 'no_pico': 140.0},
+       ## 'pequenos': {'pico': 50.0, 'no_pico': 80.0},
+        ##'motos': {'pico': 760.0, 'no_pico': 760.0}
+    #}##las tasas de llegadas se duplican ya que se supone que los tiempos que daba """
 def tiempo_servicio(tipo):##segun el vehiculo que llega se le da un tiempo de servicio aleatorio
     if tipo == 'gran_porte':
         return random.uniform(45.0, 55.0)
@@ -190,10 +201,12 @@ def main():
     costos_dinamico = []##aca se guardan los costos de abrir la tercer 
     
     for i in range(n_replicas):
+        random.seed(i)
         m_base, _ = correr_simulacion(escenario_dinamico=False)##corre la simulacion sin
         ##la posibilidad de abrir la tercer cabina
         res_base.append(m_base)##agrega el resultado al array
         
+        random.seed(i)
         m_din, c_din = correr_simulacion(escenario_dinamico=True)##corre la simulacion
         ##con la posibilidad de abrir la tercer cabina
         res_dinamico.append(m_din)##agrega la cantidad autos que estuvieron mas de 3 min
@@ -254,3 +267,18 @@ def main():
 
 if __name__ == '__main__':
     main()
+##si corremos la simulacion con los valores reales de la tasa de llegadas
+##obtenemos que hay mas multados en la simulacion dinamica que en la base
+##esto es raro debido a que la tasa de arribos es igual para los dos, lo que
+##cambia es que en la simulacion dinamica hay mas cabinas para atender
+##lo que deberia hacer que suba el tiempo de servicio y hay menos multados
+##es ilogico pero tiene una explicacion->en la simulacion base (con una cabina
+##y dos en horario pico), el promedio de autos multados se saca en base a una
+##lista, en la cual se agregan los tiempos desde que el vehiculo llego a 
+##la cola hasta que fue atendido. El problema es que en la simulacion base
+##hay mucho vehiculos que no se llegan a atender para cuando termina el dia
+##por lo tanto no se incluyen en esta lista, en cambio en el caso dinamico,
+##como hay mas servidores, se atienden mas autos, por lo que se aniaden 
+##mas autos multados a la lista y por eso el promedio es mas alto
+##pero en realidad, obviamente hay mas tiempo de espera y mas autos multados
+##en el caso base que tiene menos servidores.
