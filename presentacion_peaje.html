@@ -1,0 +1,519 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Simulación de Peaje - MSTD</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Segoe UI', Arial, sans-serif;
+    background: #0f1b4c;
+    color: white;
+  }
+
+  .slide {
+    width: 1280px;
+    min-height: 720px;
+    margin: 0 auto 6px auto;
+    background: #0f1b4c;
+    padding: 60px 80px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    position: relative;
+    overflow: hidden;
+    page-break-after: always;
+  }
+
+  .slide::before {
+    content: '';
+    position: absolute;
+    right: -120px; top: -120px;
+    width: 500px; height: 500px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.03);
+  }
+
+  /* COVER */
+  .cover { text-align: center; align-items: center; }
+  .cover .tag {
+    font-size: 18px; color: #8ab4f8; letter-spacing: 4px;
+    text-transform: uppercase; margin-bottom: 16px;
+  }
+  .cover h1 {
+    font-size: 72px; font-weight: 900; line-height: 1;
+    color: white; margin-bottom: 12px;
+  }
+  .cover h1 span { color: #f5c842; }
+  .cover .subtitle {
+    font-size: 28px; color: #8ab4f8; font-weight: 600;
+    margin-bottom: 50px;
+  }
+  .cover-meta {
+    display: flex; gap: 80px; margin-top: 20px;
+  }
+  .cover-meta div { text-align: left; }
+  .cover-meta .label {
+    font-size: 13px; font-weight: 700; color: #f5c842;
+    text-transform: uppercase; letter-spacing: 2px; margin-bottom: 6px;
+  }
+  .cover-meta .value { font-size: 16px; color: #ccd6f6; }
+
+  /* SECTION TITLES */
+  .slide-title {
+    font-size: 48px; font-weight: 900; color: white;
+    margin-bottom: 8px; line-height: 1.1;
+  }
+  .slide-title span { color: #f5c842; }
+  .slide-subtitle {
+    font-size: 20px; color: #8ab4f8; font-weight: 600;
+    margin-bottom: 40px;
+  }
+
+  /* CARDS */
+  .cards { display: flex; gap: 20px; flex-wrap: wrap; }
+  .card {
+    background: #1e2d6b;
+    border-radius: 16px;
+    padding: 24px 28px;
+    flex: 1; min-width: 200px;
+    display: flex; align-items: flex-start; gap: 16px;
+  }
+  .card-num {
+    background: #3b5bdb;
+    border-radius: 12px;
+    min-width: 40px; height: 40px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 20px; font-weight: 900; color: white; flex-shrink: 0;
+  }
+  .card-text { font-size: 15px; line-height: 1.5; color: #ccd6f6; }
+  .card-text strong { color: #f5c842; }
+
+  /* TWO COLUMN */
+  .two-col { display: flex; gap: 40px; align-items: flex-start; }
+  .col { flex: 1; }
+
+  /* INFO BOX */
+  .info-box {
+    background: #1e2d6b; border-radius: 16px;
+    padding: 24px 28px; margin-bottom: 20px;
+  }
+  .info-box h3 {
+    font-size: 16px; font-weight: 700; color: #f5c842;
+    text-transform: uppercase; letter-spacing: 2px; margin-bottom: 12px;
+  }
+  .info-box p, .info-box li {
+    font-size: 15px; color: #ccd6f6; line-height: 1.7;
+  }
+  .info-box ul { padding-left: 18px; }
+
+  /* TABLE */
+  table {
+    width: 100%; border-collapse: collapse;
+    font-size: 15px;
+  }
+  th {
+    background: #3b5bdb; color: white;
+    padding: 12px 16px; text-align: left; font-weight: 700;
+  }
+  td {
+    padding: 11px 16px; color: #ccd6f6; border-bottom: 1px solid #1e2d6b;
+  }
+  tr:nth-child(even) td { background: rgba(30,45,107,0.4); }
+  .ok { color: #69db7c; font-weight: 700; }
+  .bad { color: #ff6b6b; font-weight: 700; }
+
+  /* CODE BLOCK */
+  .code {
+    background: #0a1235;
+    border-left: 4px solid #3b5bdb;
+    border-radius: 8px;
+    padding: 16px 20px;
+    font-family: 'Courier New', monospace;
+    font-size: 14px;
+    color: #8ab4f8;
+    margin: 10px 0;
+    line-height: 1.7;
+  }
+  .code .kw { color: #f5c842; }
+  .code .fn { color: #69db7c; }
+  .code .cm { color: #555f8a; }
+  .code .num { color: #ff9f43; }
+
+  /* STEP BADGE */
+  .step-badge {
+    display: inline-block;
+    background: #f5c842; color: #0f1b4c;
+    font-size: 12px; font-weight: 900;
+    padding: 4px 14px; border-radius: 20px;
+    text-transform: uppercase; letter-spacing: 2px;
+    margin-bottom: 14px;
+  }
+
+  /* BIG NUMBER */
+  .big-num {
+    font-size: 56px; font-weight: 900; color: #f5c842;
+    line-height: 1;
+  }
+  .big-num-label {
+    font-size: 14px; color: #8ab4f8; text-transform: uppercase;
+    letter-spacing: 2px; margin-top: 4px;
+  }
+
+  /* CONCLUSION BOXES */
+  .result-row { display: flex; gap: 20px; margin-bottom: 20px; }
+  .result-box {
+    flex: 1; background: #1e2d6b; border-radius: 16px;
+    padding: 24px 28px;
+  }
+  .result-box.highlight { background: #2d4a1e; border: 2px solid #69db7c; }
+  .result-box h3 { font-size: 14px; color: #8ab4f8; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 8px; }
+  .result-box .val { font-size: 36px; font-weight: 900; color: #f5c842; }
+  .result-box .val.green { color: #69db7c; }
+  .result-box p { font-size: 14px; color: #ccd6f6; margin-top: 8px; line-height: 1.5; }
+
+  /* FORMULA BOX */
+  .formula {
+    background: #0a1235;
+    border: 1px solid #3b5bdb;
+    border-radius: 12px;
+    padding: 20px 28px;
+    text-align: center;
+    font-size: 20px;
+    color: #f5c842;
+    font-weight: 700;
+    margin: 16px 0;
+    letter-spacing: 1px;
+  }
+
+  /* PAGE NUMBER */
+  .page-num {
+    position: absolute; bottom: 24px; right: 40px;
+    font-size: 13px; color: #3b5bdb; font-weight: 700;
+  }
+  .page-line {
+    position: absolute; bottom: 0; left: 0; right: 0;
+    height: 4px; background: linear-gradient(90deg, #3b5bdb, #f5c842);
+  }
+
+  @media print {
+    .slide { page-break-after: always; }
+  }
+</style>
+</head>
+<body>
+
+<!-- SLIDE 1: COVER -->
+<div class="slide cover">
+  <div class="tag">Modelo, Simulación y Teoría de la Decisión</div>
+  <h1>Estudio de un<br><span>Sistema de Peaje</span></h1>
+  <div class="subtitle">Simulación de Colas con SimPy · Análisis Económico</div>
+  <div class="cover-meta">
+    <div>
+      <div class="label">Materia</div>
+      <div class="value">Modelo, Simulación y Teoría de la Decisión</div>
+    </div>
+    <div>
+      <div class="label">Integrantes</div>
+      <div class="value">Valentino Aimale · Martin López</div>
+    </div>
+    <div>
+      <div class="label">Profesores</div>
+      <div class="value">Esteban Gidekel · Gastón Lezcano · Guido Mehaudy</div>
+    </div>
+  </div>
+  <div class="page-line"></div>
+</div>
+
+<!-- SLIDE 2: PROBLEMA -->
+<div class="slide">
+  <div class="slide-title">El <span>Problema</span> a Resolver</div>
+  <div class="slide-subtitle">Autovía Olavarría – Azul · Sistema de cobro de peaje</div>
+
+  <div class="two-col">
+    <div class="col">
+      <div class="info-box">
+        <h3>El Sistema</h3>
+        <ul>
+          <li>2 estaciones: <strong style="color:#f5c842">A (Ascendente)</strong> y <strong style="color:#f5c842">D (Descendente)</strong></li>
+          <li>3 cabinas por estación, pero solo <strong style="color:#f5c842">1 abierta</strong> todo el día</li>
+          <li><strong style="color:#f5c842">2 cabinas</strong> abiertas de 7–9h en A y de 19–20h en D</li>
+          <li>4 tipos de vehículos con distribuciones distintas</li>
+        </ul>
+      </div>
+      <div class="info-box">
+        <h3>Tiempos de Servicio</h3>
+        <ul>
+          <li><strong style="color:#f5c842">Gran porte:</strong> Uniforme(45, 55) seg</li>
+          <li><strong style="color:#f5c842">Grandes / Motos:</strong> Exponencial(media=30) seg</li>
+          <li><strong style="color:#f5c842">Pequeños:</strong> Triangular(mín=15, moda=20, máx=35) seg</li>
+          <li><strong style="color:#f5c842">Ambulancias / Policía:</strong> paso libre fuera de cola</li>
+        </ul>
+      </div>
+    </div>
+    <div class="col">
+      <div class="info-box">
+        <h3>La Pregunta Central</h3>
+        <p style="font-size:17px; line-height:1.8; color:white;">
+          La <strong style="color:#f5c842">3ra cabina</strong> cuesta <strong style="color:#f5c842">$100 cada 10 minutos</strong> habilitarla.
+          Solo puede abrirse en bloques mínimos de 10 minutos.
+          <br><br>
+          ¿Cuánto tiene que costar la <strong style="color:#f5c842">multa por espera &gt; 3 minutos</strong>
+          para que al concesionario le convenga abrir la 3ra cabina?
+          <br><br>
+          Demostrar con <strong style="color:#f5c842">95% de confianza</strong>.
+        </p>
+      </div>
+    </div>
+  </div>
+  <div class="page-num">02</div>
+  <div class="page-line"></div>
+</div>
+
+<!-- SLIDE 3: SUPUESTO — COLA EXPLOSIVA -->
+<div class="slide">
+  <div class="slide-title">El <span>Supuesto</span> Clave</div>
+  <div class="slide-subtitle">¿Por qué los tiempos de llegada se duplicaron?</div>
+
+  <div class="two-col">
+    <div class="col">
+      <div class="info-box">
+        <h3>Distribución del tráfico</h3>
+        <p>La autovía es bidireccional. Los vehículos que van de Olavarría → Azul pasan por la estación <strong style="color:#f5c842">A</strong>, y los que van de Azul → Olavarría pasan por la estación <strong style="color:#f5c842">D</strong>. Asumiendo un reparto <strong style="color:#f5c842">50/50</strong>, cada estación recibe la mitad del flujo enunciado.</p>
+        <br>
+        <p style="color:#f5c842; font-size:17px; font-weight:700;">1 cada 30 seg (total) → 1 cada 60 seg (por estación)</p>
+      </div>
+      <div class="info-box">
+        <h3>Flujos con tiempos originales (sin duplicar)</h3>
+        <p style="color:#ccd6f6;">
+          λ_total (pico) = 1/30 + 1/40 + 1/25 + 1/380 ≈ <strong style="color:#ff6b6b;">0.101 veh/seg</strong><br>
+          Servicio promedio ponderado ≈ 32 seg<br><br>
+          <strong style="color:#ff6b6b;">ρ = 0.101 × 32 = 3.23</strong><br>
+          Se necesitan más de 3 cabinas para estabilizar → <strong style="color:#ff6b6b;">SISTEMA EXPLOSIVO</strong>
+        </p>
+      </div>
+    </div>
+    <div class="col">
+      <table>
+        <tr>
+          <th>Escenario</th>
+          <th>Cabinas</th>
+          <th>ρ</th>
+          <th>Estado</th>
+        </tr>
+        <tr>
+          <td>Original · no pico</td><td>1</td><td>2.01</td><td class="bad">Explosivo</td>
+        </tr>
+        <tr>
+          <td>Original · pico</td><td>2</td><td>1.62</td><td class="bad">Explosivo</td>
+        </tr>
+        <tr>
+          <td>Original · pico</td><td>3</td><td>1.08</td><td class="bad">Explosivo</td>
+        </tr>
+        <tr>
+          <td style="color:#f5c842">50/50 · no pico</td><td style="color:#f5c842">1</td><td style="color:#f5c842">0.89</td><td class="ok">Estable ✓</td>
+        </tr>
+        <tr>
+          <td style="color:#f5c842">50/50 · pico</td><td style="color:#f5c842">2</td><td style="color:#f5c842">0.81</td><td class="ok">Estable ✓</td>
+        </tr>
+        <tr>
+          <td style="color:#f5c842">50/50 · pico c/3ra</td><td style="color:#f5c842">3</td><td style="color:#f5c842">0.54</td><td class="ok">Estable ✓</td>
+        </tr>
+      </table>
+      <div class="info-box" style="margin-top:20px;">
+        <h3>Conclusión del supuesto</h3>
+        <p>Sin el ajuste 50/50 la cola crecería infinitamente <strong style="color:#ff6b6b;">durante todo el día</strong>, haciendo la simulación irrelevante. El supuesto es físicamente plausible y matemáticamente necesario.</p>
+      </div>
+    </div>
+  </div>
+  <div class="page-num">03</div>
+  <div class="page-line"></div>
+</div>
+
+<!-- SLIDE 4: FUNCIONES DEL CÓDIGO -->
+<div class="slide">
+  <div class="slide-title">Funciones del <span>Código</span></div>
+  <div class="slide-subtitle">Arquitectura de la simulación en SimPy</div>
+
+  <div class="cards">
+    <div class="card">
+      <div class="card-num">1</div>
+      <div class="card-text">
+        <strong>PeajeConfig</strong><br>
+        Diccionario con los intervalos promedio de llegada (seg) por tipo de vehículo y estado (pico / no pico).
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-num">2</div>
+      <div class="card-text">
+        <strong>tiempo_servicio()</strong><br>
+        Genera un número aleatorio de segundos de atención según la distribución correcta: Uniforme, Exponencial o Triangular.
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-num">3</div>
+      <div class="card-text">
+        <strong>Estacion</strong><br>
+        Clase que modela cada peaje: contiene las 3 cabinas como recursos SimPy y registra el estado activo de cada una.
+      </div>
+    </div>
+  </div>
+  <div class="cards" style="margin-top:16px;">
+    <div class="card">
+      <div class="card-num">4</div>
+      <div class="card-text">
+        <strong>gestor_horario_base()</strong><br>
+        Proceso que duerme hasta el próximo cambio de horario y ajusta cuántas cabinas base están abiertas (1 normal, 2 en pico).
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-num">5</div>
+      <div class="card-text">
+        <strong>supervisor_dinamico()</strong><br>
+        Cada 10 min calcula la espera media. Si supera 3 min y hay cabina disponible, abre la 3ra y registra $100 de costo.
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-num">6</div>
+      <div class="card-text">
+        <strong>generador_vehiculos()</strong><br>
+        Genera vehículos con llegadas exponenciales según la hora. Hay 4 generadores activos en paralelo por estación.
+      </div>
+    </div>
+  </div>
+  <div class="cards" style="margin-top:16px;">
+    <div class="card">
+      <div class="card-num">7</div>
+      <div class="card-text">
+        <strong>vehiculo()</strong><br>
+        Cada vehículo elige la cabina con menor cola, espera, registra su tiempo de espera y se atiende.
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-num">8</div>
+      <div class="card-text">
+        <strong>correr_simulacion()</strong><br>
+        Construye el entorno completo, lanza todos los procesos y ejecuta 24hs. Devuelve vehículos multados y costo de cabinas.
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-num">9</div>
+      <div class="card-text">
+        <strong>main()</strong><br>
+        Corre 30 réplicas de cada escenario, calcula medias, intervalos de confianza al 95% y la multa de equilibrio.
+      </div>
+    </div>
+  </div>
+  <div class="page-num">04</div>
+  <div class="page-line"></div>
+</div>
+
+<!-- SLIDE 5: PASOS MONTE CARLO -->
+<div class="slide">
+  <div class="slide-title">Los 5 Pasos de <span>Monte Carlo</span></div>
+  <div class="slide-subtitle">Cómo se aplican en esta simulación</div>
+
+  <div style="display:flex; flex-direction:column; gap:14px;">
+
+    <div style="display:flex; gap:16px; align-items:stretch;">
+      <div style="background:#f5c842; color:#0f1b4c; border-radius:12px; padding:14px 20px; font-weight:900; font-size:16px; min-width:90px; text-align:center; display:flex; align-items:center; justify-content:center;">PASO 0</div>
+      <div class="info-box" style="margin:0; flex:1;">
+        <h3>Construir el Modelo</h3>
+        <p>Clases <code style="color:#f5c842">Estacion</code>, procesos <code style="color:#f5c842">gestor_horario_base</code>, <code style="color:#f5c842">supervisor_dinamico</code>, <code style="color:#f5c842">generador_vehiculos</code> y <code style="color:#f5c842">vehiculo</code>. Se definen entidades, recursos, lógica de colas y condiciones de apertura de cabinas.</p>
+      </div>
+    </div>
+
+    <div style="display:flex; gap:16px; align-items:stretch;">
+      <div style="background:#3b5bdb; color:white; border-radius:12px; padding:14px 20px; font-weight:900; font-size:16px; min-width:90px; text-align:center; display:flex; align-items:center; justify-content:center;">PASO 1</div>
+      <div class="info-box" style="margin:0; flex:1;">
+        <h3>Generar Números Aleatorios</h3>
+        <p>El módulo <code style="color:#f5c842">random</code> de Python genera internamente números <strong style="color:#f5c842">U(0,1)</strong> en cada llamada a <code style="color:#f5c842">random.expovariate()</code>, <code style="color:#f5c842">random.uniform()</code> y <code style="color:#f5c842">random.triangular()</code>.</p>
+      </div>
+    </div>
+
+    <div style="display:flex; gap:16px; align-items:stretch;">
+      <div style="background:#3b5bdb; color:white; border-radius:12px; padding:14px 20px; font-weight:900; font-size:16px; min-width:90px; text-align:center; display:flex; align-items:center; justify-content:center;">PASO 2</div>
+      <div class="info-box" style="margin:0; flex:1;">
+        <h3>Transformar en Entradas Válidas</h3>
+        <p>Los U(0,1) se convierten en tiempos con las distribuciones reales del problema:
+        <strong style="color:#f5c842">Uniforme(45,55)</strong> · <strong style="color:#f5c842">Exponencial(λ=1/30)</strong> · <strong style="color:#f5c842">Triangular(15,20,35)</strong> · llegadas <strong style="color:#f5c842">Exponencial(λ=1/tasa)</strong></p>
+      </div>
+    </div>
+
+    <div style="display:flex; gap:16px; align-items:stretch;">
+      <div style="background:#3b5bdb; color:white; border-radius:12px; padding:14px 20px; font-weight:900; font-size:16px; min-width:90px; text-align:center; display:flex; align-items:center; justify-content:center;">PASO 3</div>
+      <div class="info-box" style="margin:0; flex:1;">
+        <h3>Ejecutar el Modelo</h3>
+        <p><code style="color:#f5c842">env.run(until=86400)</code> procesa 24hs de simulación. Cada vehículo llega, espera en cola, se atiende y registra su espera. Se repite <strong style="color:#f5c842">30 veces</strong> por escenario.</p>
+      </div>
+    </div>
+
+    <div style="display:flex; gap:16px; align-items:stretch;">
+      <div style="background:#3b5bdb; color:white; border-radius:12px; padding:14px 20px; font-weight:900; font-size:16px; min-width:90px; text-align:center; display:flex; align-items:center; justify-content:center;">PASO 4</div>
+      <div class="info-box" style="margin:0; flex:1;">
+        <h3>Contabilidad y Estadística</h3>
+        <p>Se cuenta cuántos vehículos esperaron <strong style="color:#f5c842">&gt;3 min</strong> en cada réplica. Con las 30 réplicas se calcula media, <strong style="color:#f5c842">intervalo de confianza al 95%</strong> (t de Student, df=29) y la <strong style="color:#f5c842">multa de equilibrio</strong>.</p>
+      </div>
+    </div>
+
+  </div>
+  <div class="page-num">05</div>
+  <div class="page-line"></div>
+</div>
+
+<!-- SLIDE 6: RESULTADOS Y CONCLUSIÓN -->
+<div class="slide">
+  <div class="slide-title"><span>Resultados</span> y Conclusión</div>
+  <div class="slide-subtitle">30 réplicas por escenario · IC 95% con distribución t de Student</div>
+
+  <div class="result-row">
+    <div class="result-box">
+      <h3>Escenario Base (sin 3ra cabina)</h3>
+      <div class="val">2.941</div>
+      <p>vehículos/día esperan más de 3 min<br>IC 95%: (2.769 – 3.113)</p>
+    </div>
+    <div class="result-box">
+      <h3>Escenario Dinámico (con 3ra cabina)</h3>
+      <div class="val">1.080</div>
+      <p>vehículos/día esperan más de 3 min<br>IC 95%: (1.051 – 1.109)</p>
+    </div>
+    <div class="result-box">
+      <h3>Costo extra por abrir 3ra cabina</h3>
+      <div class="val">$4.553</div>
+      <p>promedio diario en bloques de $100/10min</p>
+    </div>
+  </div>
+
+  <div class="formula">
+    Multa de equilibrio = Costo cabina / Vehículos salvados = $4.553 / 1.860 = <strong>$2,45 por vehículo</strong>
+  </div>
+
+  <div class="result-row">
+    <div class="result-box highlight">
+      <h3>Respuesta al problema</h3>
+      <div class="val green">$2,45</div>
+      <p>
+        Si la multa por espera &gt;3 min es <strong style="color:#f5c842">mayor a $2,45</strong>, al concesionario le conviene abrir la 3ra cabina.<br>
+        Si la multa es <strong style="color:#ff6b6b">menor a $2,45</strong>, es más barato pagar las multas.<br>
+        Los IC no se superponen → diferencia estadísticamente significativa al 95%.
+      </p>
+    </div>
+    <div class="result-box">
+      <h3>Interpretación</h3>
+      <p style="font-size:15px; line-height:1.8; color:#ccd6f6; margin-top:0;">
+        La 3ra cabina salva ~<strong style="color:#f5c842">1.860 vehículos/día</strong> de exceder los 3 minutos de espera.<br>
+        El costo de abrirla es ~<strong style="color:#f5c842">$4.553/día</strong>.<br>
+        Con una multa de <strong style="color:#f5c842">$2,45/vehículo</strong>, ambas opciones cuestan lo mismo.<br>
+        Por encima de ese valor, la cabina extra se <strong style="color:#69db7c">paga sola</strong>.
+      </p>
+    </div>
+  </div>
+
+  <div class="page-num">06</div>
+  <div class="page-line"></div>
+</div>
+
+</body>
+</html>
